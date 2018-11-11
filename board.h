@@ -68,7 +68,7 @@ public:
             generate();
         } while (!connected());
     }
-    void generate() {
+    void generate_board() {
         cells_.assign(n_, vector <cell> (m_, empty));
         walls_.assign(n_, vector <__int8_t> (m_, 0));
         for (int i = 0; i < m_; ++i) {
@@ -79,7 +79,10 @@ public:
             set_bit(walls_[i][0],     left,  1);
             set_bit(walls_[i][m_ - 1], right, 1);
         }
-        int p = int(log((long double)n_ * m_) * 2.0);
+    }
+    void generate_random() {
+        generate_board();
+        int p = n_ * m_ / 2;
         for (int i = 0; i + 1 < n_; ++i) {
             for (int j = 0; j + 1 < m_; ++j) {
                 int t = rnd() % (n_ * m_);
