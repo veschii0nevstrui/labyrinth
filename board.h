@@ -37,9 +37,12 @@ struct point {
     bool operator == (point p) {
         return x == p.x && y == p.y;
     }
+    void write() {
+        cout << x << " " << y << endl;
+    }
 };
 
-point dxy[] = {{-1, 0}, {0, -1}, {1, 0}, {0, 1}};
+point dxy[] = {{0, -1}, {-1, 0}, {0, 1}, {1, 0}};
 
 bool get_bit(__int8_t a, int i) {
     return a & (1 << i);
@@ -60,7 +63,10 @@ public:
         m_ = m;
         cells_.assign(n_, vector <cell> (m_, empty));
         walls_.assign(m_, vector <__int8_t> (m_, 0));
-        generate();
+        
+        do {
+            generate();
+        } while (!connected());
     }
     void generate() {
         cells_.assign(n_, vector <cell> (m_, empty));
@@ -127,7 +133,7 @@ public:
    | |
 
 */
-    bool is_wall(point p, direction d) {
+    bool is_wall(point p, int d) {
         if (!in_board(p)) {
             throw std::invalid_argument("Point is not in board");
         }
@@ -138,7 +144,6 @@ public:
         if (!in_board(p) || !in_board(q)) {
             throw std::invalid_argument("Point is not in board");
         }
-
         for (int d = left; d <= down; d += 1) {
             if (p + dxy[d] == q) {
                 return is_wall(p, d);
@@ -174,12 +179,11 @@ private:
         return 1;
     }
     
-    // НЕ РАБОТАЕТ СО СТЕНАМИ ИСПРАВЬ НАХУЙ
     void dfs(point v, vector <vector <bool> > &used) {
         used[v.x][v.y] = 1;
         for (int d = left; d <= down; ++d) {
             point nv = v + dxy[d];
-            if (in_board(nv) && !used[nv.x][nv.y]) {
+            if (in_board(nv) && !used[nv.x][nv.y] && !is_wall(v, nv)) {
                 dfs(nv, used);
             }
         }

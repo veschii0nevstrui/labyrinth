@@ -4,14 +4,14 @@
 using namespace std;
 
 int main() {
-    board b(3, 4);
     while (true) {
-        b.write();
-        int c;
-        cin >> c;
-        b.generate();
-        if (!c) {
+        int n, m;
+        cin >> n >> m;
+        if (n == 0) {
             break;
         }
+        board b(n, m);
+        b.write();
+        cout << endl;
     }
 }
