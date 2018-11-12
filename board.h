@@ -189,7 +189,7 @@ private:
     }
 
     int get_point_id(point p) {
-        return p.x * n_ + p.y;
+        return p.x * m_ + p.y;
     }
 
     void generate_tree() {
