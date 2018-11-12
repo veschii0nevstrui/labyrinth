@@ -5,6 +5,10 @@
 #include <random>
 #include <cmath>
 #include <iostream>
+#include <algorithm>
+
+#include "setting.h"
+#include "dsu.h"
 
 std::mt19937 rnd(std::random_device{}());
 
@@ -56,47 +60,21 @@ void set_bit(__int8_t &a, int i, bool b) {
     }
 }
 
+int back_dir(int d) {
+    return (d + 2) % 4;
+}
+
 class board {
 public:
-    board(int n = 3, int m = 4) {
+    board(setting &s, int n = 3, int m = 4) {
         n_ = n;
         m_ = m;
+        setting_ = s;
+        
         cells_.assign(n_, vector <cell> (m_, empty));
         walls_.assign(m_, vector <__int8_t> (m_, 0));
         
-        do {
-            generate();
-        } while (!connected());
-    }
-    void generate_board() {
-        cells_.assign(n_, vector <cell> (m_, empty));
-        walls_.assign(n_, vector <__int8_t> (m_, 0));
-        for (int i = 0; i < m_; ++i) {
-            set_bit(walls_[0][i],     up,   1);
-            set_bit(walls_[n_ - 1][i], down, 1);
-        }
-        for (int i = 0; i < n_; ++i) {
-            set_bit(walls_[i][0],     left,  1);
-            set_bit(walls_[i][m_ - 1], right, 1);
-        }
-    }
-    void generate_random() {
-        generate_board();
-        int p = n_ * m_ / 2;
-        for (int i = 0; i + 1 < n_; ++i) {
-            for (int j = 0; j + 1 < m_; ++j) {
-                int t = rnd() % (n_ * m_);
-                if (t > p) {
-                    set_bit(walls_[i][j], right, 1);
-                    set_bit(walls_[i + dxy[right].x][j + dxy[right].y], left, 1);
-                }
-                t = rnd() % (n_ * m_);
-                if (t > p) {
-                    set_bit(walls_[i][j], down, 1);
-                    set_bit(walls_[i + dxy[down].x][j + dxy[down].y], up, 1);
-                }
-            }
-        }
+        generate_tree();
     }
     void write() {
         cout << " ";
@@ -108,6 +86,7 @@ public:
             }
         }
         cout << endl;
+        
         for (int i = 0; i < n_; ++i) {
             for (int j = 0; j < m_; ++j) {
                 if (get_bit(walls_[i][j], left)) {
@@ -115,12 +94,14 @@ public:
                 } else {
                     cout << " ";
                 }
+                
                 if (get_bit(walls_[i][j], down)) {
                     cout << "_";
                 } else {
                     cout << " ";
                 }
             }
+            
             if (get_bit(walls_[i][m_ - 1], right)) {
                 cout << "|";
             } else {
@@ -129,13 +110,7 @@ public:
             cout << endl;
         }
     }
-/*
-
-
-    _ _ _ _
-   | |
-
-*/
+    
     bool is_wall(point p, int d) {
         if (!in_board(p)) {
             throw std::invalid_argument("Point is not in board");
@@ -143,11 +118,12 @@ public:
 
         return get_bit(walls_[p.x][p.y], d);
     }
+    
     bool is_wall(point p, point q) {
         if (!in_board(p) || !in_board(q)) {
             throw std::invalid_argument("Point is not in board");
         }
-        for (int d = left; d <= down; d += 1) {
+        for (int d = 0; d < 4; ++d) {
             if (p + dxy[d] == q) {
                 return is_wall(p, d);
             }
@@ -155,20 +131,25 @@ public:
 
         throw std::invalid_argument("Points are not close.");
     }
+    
     cell in_cell(point p) {
         return cells_[p.x][p.y];
     }
+
 private:
     vector <vector <cell> > cells_;
-    vector <vector <__int8_t> > walls_; //bit representation of the walls around the cell
+    vector <vector <__int8_t> > walls_; // bit representation of the walls around the cell
                                         // 0 - left
                                         // 1 - up
                                         // 2 - right
                                         // 0 - down
+    int n_, m_;
+    setting setting_;
+
     bool in_board(point p) {
         return (0 <= p.x && p.x < n_ && 0 <= p.y && p.y < m_);
     }
-    int n_, m_;
+
     bool connected() {
         vector <vector <bool> > used(n_, vector <bool> (m_, 0));
         dfs(point(0, 0), used);
@@ -184,11 +165,82 @@ private:
     
     void dfs(point v, vector <vector <bool> > &used) {
         used[v.x][v.y] = 1;
-        for (int d = left; d <= down; ++d) {
+        for (int d = 0; d < 4; ++d) {
             point nv = v + dxy[d];
-            if (in_board(nv) && !used[nv.x][nv.y] && !is_wall(v, nv)) {
+            if (in_board(nv) && !used[nv.x][nv.y] && !is_wall(v, d)) {
                 dfs(nv, used);
             }
         }
     }
+    
+    void generate_border() {
+        cells_.assign(n_, vector <cell> (m_, empty));
+        walls_.assign(n_, vector <__int8_t> (m_, 0));
+        
+        for (int i = 0; i < m_; ++i) {
+            set_bit(walls_[0][i],     up,   1);
+            set_bit(walls_[n_ - 1][i], down, 1);
+        }
+
+        for (int i = 0; i < n_; ++i) {
+            set_bit(walls_[i][0],     left,  1);
+            set_bit(walls_[i][m_ - 1], right, 1);
+        }
+    }
+
+    int get_point_id(point p) {
+        return p.x * n_ + p.y;
+    }
+
+    void generate_tree() {
+        walls_.assign(n_, vector <__int8_t> (m_, 1 | 2 | 4 | 8));
+        dsu d(n_ * m_);
+        std::vector <std::pair <point, direction> > edges;
+        
+        for (int i = 0; i + 1 < n_; ++i) {
+            for (int j = 0; j + 1 < m_; ++j) {
+                edges.push_back({{i, j}, right});
+                edges.push_back({{i, j}, down});
+            }
+        }
+        for (int i = 0; i + 1 < n_; ++i) {
+            edges.push_back({{i, m_ - 1}, down});
+        }
+        for (int j = 0; j + 1 < m_; ++j) {
+            edges.push_back({{n_ - 1, j}, right});
+        }
+
+        std::random_shuffle(edges.begin(), edges.end(), [](int mod){ return rnd() % mod;});
+        // ЗАЧЕКАТЬ, ЧТО ЭТА ШТУКА СЛУЧАЙНА И РАВНОМЕРНА
+        
+        for (auto edge : edges) {
+            point v = edge.first;
+            point nv = v + dxy[edge.second];
+            if (!d.same(get_point_id(v), get_point_id(nv))) {
+                d.my_union(get_point_id(v), get_point_id(nv));
+                set_bit(walls_[v.x][v.y], edge.second, 0);
+                set_bit(walls_[nv.x][nv.y], back_dir(edge.second), 0);
+            }
+        }
+    }
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

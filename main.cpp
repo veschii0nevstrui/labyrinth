@@ -4,13 +4,14 @@
 using namespace std;
 
 int main() {
+    setting s(1);
     while (true) {
         int n, m;
         cin >> n >> m;
         if (n == 0) {
             break;
         }
-        board b(n, m);
+        board b(s, n, m);
         b.write();
         cout << endl;
     }
