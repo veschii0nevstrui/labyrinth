@@ -8,6 +8,9 @@ int main() {
     while (true) {
         int n, m;
         cin >> n >> m;
+        long double d;
+        cin >> d;
+        s.p = d;
         if (n == 0) {
             break;
         }

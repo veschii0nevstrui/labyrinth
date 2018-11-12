@@ -74,7 +74,7 @@ public:
         cells_.assign(n_, vector <cell> (m_, empty));
         walls_.assign(m_, vector <__int8_t> (m_, 0));
         
-        generate_tree();
+        generate();
     }
     void write() {
         cout << " ";
@@ -221,6 +221,32 @@ private:
                 set_bit(walls_[v.x][v.y], edge.second, 0);
                 set_bit(walls_[nv.x][nv.y], back_dir(edge.second), 0);
             }
+        }
+    }
+
+    void random_edge(point v, direction d, int p, int q) {
+        if (rnd() % q < p) {
+            point nv = v + dxy[d];
+            set_bit(walls_[v.x][v.y], d, 0);
+            set_bit(walls_[nv.x][nv.y], back_dir(d), 0);
+        }
+    }
+
+    void generate() {
+        generate_tree();
+        int count_edges = 2 * n_ * m_ - n_ - m_;
+        int p = (int)(setting_.p * count_edges);
+        for (int i = 0; i + 1 < n_; ++i) {
+            for (int j = 0; j + 1 < m_; ++j) {
+                random_edge({i, j}, right, p, count_edges);
+                random_edge({i, j}, down, p, count_edges);
+            }
+        }
+        for (int i = 0; i + 1 < n_; ++i) {
+            random_edge({i, m_ - 1}, down, p, count_edges);
+        }
+        for (int j = 0; j + 1 < m_; ++j) {
+            random_edge({n_ - 1, j}, right, p, count_edges);
         }
     }
 };
