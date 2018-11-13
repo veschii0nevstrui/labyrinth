@@ -10,7 +10,11 @@ int main() {
         cin >> n >> m;
         long double d;
         cin >> d;
-        s.p = d;
+        s.p_wall = d;
+        int cnt, len;
+        cin >> cnt >> len;
+        s.cnt_source = cnt;
+        s.mexp_len_river = len;
         if (n == 0) {
             break;
         }

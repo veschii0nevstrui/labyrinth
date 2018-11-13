@@ -19,7 +19,9 @@ using std::endl;
 
 enum cell {
     empty,
+    source,
     river,
+    estuary,
     out,
     arsenal,
     hospital
@@ -95,10 +97,25 @@ public:
                     cout << " ";
                 }
                 
+                std::string wall_down = "_";
+                std::string not_wall = " ";
+                if (cells_[i][j] == river) {
+                    wall_down = "\033[44m_\033[0m";
+                    not_wall = "\033[44m \033[0m";
+                }
+                if (cells_[i][j] == source) {
+                    wall_down = "\033[46m_\033[0m";
+                    not_wall = "\033[46m \033[0m";
+                }
+                if (cells_[i][j] == estuary) {
+                    wall_down = "\033[42m_\033[0m";
+                    not_wall = "\033[42m \033[0m";
+                }
+
                 if (get_bit(walls_[i][j], down)) {
-                    cout << "_";
+                    cout << wall_down;
                 } else {
-                    cout << " ";
+                    cout << not_wall;
                 }
             }
             
@@ -224,18 +241,9 @@ private:
         }
     }
 
-    void random_edge(point v, direction d, int p, int q) {
-        if (rnd() % q < p) {
-            point nv = v + dxy[d];
-            set_bit(walls_[v.x][v.y], d, 0);
-            set_bit(walls_[nv.x][nv.y], back_dir(d), 0);
-        }
-    }
-
-    void generate() {
-        generate_tree();
+    void remove_random_walls() {
         int count_edges = 2 * n_ * m_ - n_ - m_;
-        int p = (int)(setting_.p * count_edges);
+        int p = (int)(setting_.p_wall * count_edges);
         for (int i = 0; i + 1 < n_; ++i) {
             for (int j = 0; j + 1 < m_; ++j) {
                 random_edge({i, j}, right, p, count_edges);
@@ -248,6 +256,78 @@ private:
         for (int j = 0; j + 1 < m_; ++j) {
             random_edge({n_ - 1, j}, right, p, count_edges);
         }
+    }
+
+    void random_edge(point v, direction d, int p, int q) {
+        if (rnd() % q < p) {
+            point nv = v + dxy[d];
+            set_bit(walls_[v.x][v.y], d, 0);
+            set_bit(walls_[nv.x][nv.y], back_dir(d), 0);
+        }
+    }
+
+    void generate_rivers() {
+        int cnt_free = n_ * m_;
+        int cnt = 0;
+        vector <vector <bool> > used(n_, vector <bool> (m_, 0));
+
+        while (cnt < setting_.cnt_source && cnt_free > 0) {
+            int num = rnd() % cnt_free;
+            point start = 0;
+            for (int i = 0; i < n_; ++i) {
+                for (int j = 0; j < m_; ++j) {
+                    if (!used[i][j]) {
+                        if (num == 0) {
+                            int len = std::max(2, (int)rnd() % (setting_.mexp_len_river * 2));
+                            dfs_river({i, j}, used, len, 1, cnt, cnt_free);
+                            --num;
+                            break;
+                        } else {
+                            --num;
+                        }
+                    }
+                }
+                if (num == -1) {
+                    break;
+                }
+            }
+        }
+    }
+
+    void dfs_river(point v, vector <vector <bool> > &used, int len, bool is_start, int &cnt, int &cnt_free) {
+        used[v.x][v.y] = 1;
+        --cnt_free;
+        vector <int> ds = {0, 1, 2, 3};
+        std::random_shuffle(ds.begin(), ds.end());
+        bool fl = 0;
+        if (len > 0) {
+            for (auto d : ds) {
+                point nv = v + dxy[d];
+                if (in_board(nv) && !used[nv.x][nv.y] && !is_wall(v, d)) {
+                    dfs_river(nv, used, len - 1, 0, cnt, cnt_free);
+                    fl = 1;
+                    break;
+                }
+            }
+        }
+        if (!fl) {
+            if (!is_start) {
+                cells_[v.x][v.y] = estuary;
+            }
+            return;
+        }
+        if (is_start) {
+            cells_[v.x][v.y] = source;
+            ++cnt;
+        } else {
+            cells_[v.x][v.y] = river;
+        }
+    }
+
+    void generate() {
+        generate_tree();
+        remove_random_walls();
+        generate_rivers();
     }
 };
 
