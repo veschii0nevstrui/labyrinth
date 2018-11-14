@@ -21,5 +21,7 @@ int main() {
         board b(s, n, m);
         b.write();
         cout << endl;
+        b.write_id();
+        cout << endl;
     }
 }
