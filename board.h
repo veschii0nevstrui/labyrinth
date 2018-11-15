@@ -29,6 +29,13 @@ public:
         
         generate();
     }
+    ~board() {
+        for (auto &v : cells_) {
+            for (auto &cell : v) {
+                delete cell;
+            }
+        }
+    }
     void write() {
         cout << " ";
         for (int i = 0; i < m_; ++i) {
@@ -221,7 +228,7 @@ private:
                 if (in_board(nv) && !used[nv.x][nv.y] && !cells_[v.x][v.y]->is_wall(d)) {
                     
                     __int8_t mask = cells_[v.x][v.y]->get_mask();
-                    free(cells_[v.x][v.y]);
+                    delete cells_[v.x][v.y];
                     cells_[v.x][v.y] = new river_flow(d, id_river, mask);
 
                     dfs_river(nv, used, len - 1, 0, id_river, cnt_free);
@@ -239,7 +246,7 @@ private:
                 TODO
                 */
                 __int8_t mask = cells_[v.x][v.y]->get_mask();
-                free(cells_[v.x][v.y]);
+                delete cells_[v.x][v.y];
                 cells_[v.x][v.y] = new river_end(id_river, mask);
                 
                 ++id_river;
