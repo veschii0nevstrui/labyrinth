@@ -4,10 +4,10 @@
 class dsu {
 public:
     dsu(int n = 0) {
-        size_.assign(n, 1);
-        parent_.resize(n);
+        _size.assign(n, 1);
+        _parent.resize(n);
         for (int i = 0; i < n; ++i) {
-            parent_[i] = i;
+            _parent[i] = i;
         }
     }
 
@@ -17,11 +17,11 @@ public:
         if (u == v) {
             return;
         }
-        if (size_[u] > size_[v]) {
+        if (_size[u] > _size[v]) {
             std::swap(u, v);
         }
-        parent_[u] = v;
-        size_[v] += size_[u];
+        _parent[u] = v;
+        _size[v] += _size[u];
     }
 
     bool same(int u, int v) {
@@ -29,14 +29,14 @@ public:
     }
     
 private:
-    std::vector <int> size_;
-    std::vector <int> parent_;
+    std::vector <int> _size;
+    std::vector <int> _parent;
     
     int get(int v) {
-        if (parent_[v] == v) {
+        if (_parent[v] == v) {
             return v;
         }
-        parent_[v] = get(parent_[v]);
-        return parent_[v];
+        _parent[v] = get(_parent[v]);
+        return _parent[v];
     }
 };

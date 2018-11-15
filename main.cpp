@@ -1,27 +1,25 @@
 #include <iostream>
-#include "board.h"
+#include "game.h"
 
 using namespace std;
 
 int main() {
-    setting s(1);
     while (true) {
         int n, m;
         cin >> n >> m;
-        long double d;
-        cin >> d;
-        s.p_wall = d;
-        int cnt, len;
-        cin >> cnt >> len;
-        s.cnt_source = cnt;
-        s.mexp_len_river = len;
         if (n == 0) {
             break;
         }
-        board b(s, n, m);
-        b.write();
-        cout << endl;
-        b.write_id();
-        cout << endl;
+        long double p;
+        int cnt_r, len;
+        int cnt_h;
+        cin >> p;
+        cin >> cnt_r >> len;
+        cin >> cnt_h;
+
+        setting s(p, cnt_r, len, n, m, cnt_h);
+        game g(s);
+        g.write();
+        cout << "----------------------------------------" << endl;
     }
 }
