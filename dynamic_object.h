@@ -12,6 +12,9 @@ public:
     virtual std::string type() {
         return "dynamic_object";
     }
+    virtual point get_coords() {
+        return _cell->get_coords();
+    }
 protected:
     cell *_cell;
 private:
@@ -49,6 +52,10 @@ public:
 
     std::string type() {
         return "human";
+    }
+        
+    std::string get_cell_type() {
+        return _cell->type();
     }
     
     int get_id() {

@@ -19,11 +19,15 @@ public:
     void write() {
         _b.write();
         cout << endl;
-        for (int i = 0; i < _n; ++i) {
+        /*for (int i = 0; i < _n; ++i) {
             for (int j = 0; j < _m; ++j) {
                 _b._cells[i][j]->write();
                 cout << endl;
             }
+        }*/
+        for (auto h : _humans) {
+            h->get_coords().write();
+            cout << h->get_cell_type() << endl;
         }
     }
 

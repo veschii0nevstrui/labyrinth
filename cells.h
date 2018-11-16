@@ -11,7 +11,10 @@ using std::endl;
 
 class cell {
 public:
-    cell(__int8_t mask_walls = 0) : _mask_walls(mask_walls) {}
+    cell(int x = 0, int y = 0, __int8_t mask_walls = 0) : 
+        _mask_walls(mask_walls),
+        _x(x),
+        _y(y) {}
     virtual string type() {
         return "cell";
     }
@@ -43,9 +46,14 @@ public:
     virtual void add_neigh(cell *neigh) {
         _neighbors.push_back(neigh);
     }
-    cell *get_neigh(direction dir) {
+    virtual cell *get_neigh(direction dir) {
         return _neighbors[dir];
     }
+
+    virtual point get_coords() {
+        return point(_x, _y);
+    }
+
     virtual void add_object(object *obj) {
         _objects.push_back(obj);
     }
@@ -77,15 +85,26 @@ public:
         return _neighbors.size();
     }
 
+    virtual bool is_human() {
+        for (auto h : _objects) {
+            if (h->type() == "human") {
+                return 1;
+            }
+        }
+        return 0;
+    }
+
 private:
     __int8_t _mask_walls;
     std::vector <cell*> _neighbors; // соседи TODO придумать норм название
     std::list <object*> _objects;
+    int _x;
+    int _y;
 };
 
 class empty_cell : public cell {
 public:
-    empty_cell(__int8_t mask_walls = 0) : cell(mask_walls) {}
+    empty_cell(int x, int y, __int8_t mask_walls = 0) : cell(x, y, mask_walls) {}
     string type() {
         return "empty_cell";
     }
@@ -94,13 +113,15 @@ private:
 
 class river_flow : public cell {
 public:
-    river_flow( direction dir, 
+    river_flow( int x, 
+                int y, 
+                direction dir, 
                 int id, 
                 __int8_t mask_walls = 0
                 ):     
                     _dir(dir), 
                     _id(id), 
-                    cell(mask_walls) 
+                    cell(x, y, mask_walls) 
                     {}
     string type() {
         return "river_flow";
@@ -115,7 +136,7 @@ private:
 
 class river_end : public cell {
 public:
-    river_end(int id, __int8_t mask_walls = 0) : _id(id), cell(mask_walls) {}
+    river_end(int x, int y, int id, __int8_t mask_walls = 0) : _id(id), cell(x, y, mask_walls) {}
     string type() {
         return "river_end";
     }

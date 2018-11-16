@@ -70,6 +70,10 @@ public:
                     wall_down = "\033[42m_\033[0m";
                     not_wall = "\033[42m \033[0m";
                 }
+                if (_cells[i][j]->is_human()) {
+                    wall_down = "\033[48;5;208m_\033[0m";
+                    not_wall = "\033[48;5;208m \033[0m";
+                }
 
                 if (_cells[i][j]->is_wall(down)) {
                     cout << wall_down;
@@ -124,9 +128,9 @@ private:
     void generate() {
 
         _cells.assign(_n, vector <cell*> (_m, nullptr));
-        for (auto &v : _cells) {
-            for (auto &cell : v) {
-                cell = new empty_cell(1 | 2 | 4 | 8);
+        for (int i = 0; i < _n; ++i) {
+            for (int j = 0; j < _m; ++j) {
+                _cells[i][j] = new empty_cell(i, j, 1 | 2 | 4 | 8);
             }
         }
 
@@ -246,7 +250,7 @@ private:
                     
                     __int8_t mask = _cells[v.x][v.y]->get_mask();
                     delete _cells[v.x][v.y];
-                    _cells[v.x][v.y] = new river_flow(d, id_river, mask);
+                    _cells[v.x][v.y] = new river_flow(v.x, v.y, d, id_river, mask);
 
                     dfs_river(nv, used, len - 1, 0, id_river, cnt_free);
                     
@@ -264,7 +268,7 @@ private:
                 */
                 __int8_t mask = _cells[v.x][v.y]->get_mask();
                 delete _cells[v.x][v.y];
-                _cells[v.x][v.y] = new river_end(id_river, mask);
+                _cells[v.x][v.y] = new river_end(v.x, v.y, id_river, mask);
                 
                 ++id_river;
             }
