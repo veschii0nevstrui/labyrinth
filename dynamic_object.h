@@ -72,9 +72,15 @@ public:
 
     void move(direction dir) {
         if (!_cell->is_wall(dir)) {
-            _cell->del_object(this);
-            _cell = _cell->get_neigh(dir);
-            _cell->add_object(this); 
+            auto old = swap(dir);
+            
+            if (_cell->type() == "river_flow") {
+                if ((old->type() != "river_flow" && old->type() != "river_end") || 
+                    old->get_id() != _cell->get_id()) {
+                    
+                    swim(2);
+                }
+            }
         }
     }
 
@@ -82,6 +88,25 @@ private:
     std::string _name;
     int _id;
     std::list <treasure*> _treasures;
+    
+    void swim(int cnt) {
+        if (cnt == 0) {
+            return;
+        }
+        if (_cell->type() == "river_end") {
+            return;
+        }
+        swap(_cell->get_dir());
+        swim(cnt - 1);
+    }
+    
+    cell *swap(direction dir) {
+        _cell->del_object(this);
+        auto old = _cell;
+        _cell = _cell->get_neigh(dir);
+        _cell->add_object(this);
+        return old;
+    }
 };
 
 

@@ -105,15 +105,6 @@ public:
         }
     }
 
-    void write_sz() {
-        for (int i = 0; i < _n; ++i) {
-            for (int j = 0; j < _m; ++j) {
-                cout << _cells[i][j]->sz();
-            }
-            cout << endl;
-        }
-    }
-
     friend game;
 
 private:
@@ -121,7 +112,7 @@ private:
     int _n, _m;
     setting _setting;
 
-    bool i_nboard(point p) {
+    bool in_board(point p) {
         return (0 <= p.x && p.x < _n && 0 <= p.y && p.y < _m);
     }
     
@@ -130,7 +121,7 @@ private:
         _cells.assign(_n, vector <cell*> (_m, nullptr));
         for (int i = 0; i < _n; ++i) {
             for (int j = 0; j < _m; ++j) {
-                _cells[i][j] = new empty_cell(i, j, 1 | 2 | 4 | 8);
+                _cells[i][j] = new empty_cell(point{i, j}, 1 | 2 | 4 | 8);
             }
         }
 
@@ -246,12 +237,9 @@ private:
         if (len > 0) {
             for (auto d : ds) {
                 point nv = v + dxy[d];
-                if (i_nboard(nv) && !used[nv.x][nv.y] && !_cells[v.x][v.y]->is_wall(d)) {
-                    
-                    __int8_t mask = _cells[v.x][v.y]->get_mask();
-                    delete _cells[v.x][v.y];
-                    _cells[v.x][v.y] = new river_flow(v.x, v.y, d, id_river, mask);
-
+                if (in_board(nv) && !used[nv.x][nv.y] && !_cells[v.x][v.y]->is_wall(d)) {
+                   
+                   _cells[v.x][v.y] = new river_flow(_cells[v.x][v.y], d, id_river); 
                     dfs_river(nv, used, len - 1, 0, id_river, cnt_free);
                     
                     fl = 1;
@@ -261,15 +249,7 @@ private:
         }
         if (!fl) {
             if (!is_start) {
-
-                /*
-                Копипаста. Исправляется написанием нормального конструктора копирования
-                TODO
-                */
-                __int8_t mask = _cells[v.x][v.y]->get_mask();
-                delete _cells[v.x][v.y];
-                _cells[v.x][v.y] = new river_end(v.x, v.y, id_river, mask);
-                
+                _cells[v.x][v.y] = new river_end(_cells[v.x][v.y], id_river);
                 ++id_river;
             }
             return;
@@ -282,7 +262,7 @@ private:
                 for (int d = 0; d < 4; ++d) {
                     point nv = v + dxy[d];
                     cell *ans = nullptr;
-                    if (i_nboard(nv)) {
+                    if (in_board(nv)) {
                         ans = _cells[nv.x][nv.y];
                     }
                     _cells[v.x][v.y]->add_neigh(ans);

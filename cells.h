@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include <list>
+#include <stdexcept>
 #include "point.h"
 #include "object.h"
 
@@ -11,10 +12,18 @@ using std::endl;
 
 class cell {
 public:
-    cell(int x = 0, int y = 0, __int8_t mask_walls = 0) : 
+    cell(point coords, __int8_t mask_walls = 0) : 
         _mask_walls(mask_walls),
-        _x(x),
-        _y(y) {}
+        _coords(coords)
+        {}
+
+    cell(cell *c) :
+            _coords(c->_coords),
+            _mask_walls(c->_mask_walls)
+            {
+        delete c;
+    }
+
     virtual string type() {
         return "cell";
     }
@@ -36,27 +45,31 @@ public:
     virtual bool is_wall(int dir) {
         return get_bit(_mask_walls, dir);
     }
-    virtual __int8_t get_mask() { // TODO написать нормальный конструктор копирования,
-                          // который не будет менять маску.
-        return _mask_walls;
-    }
+
     virtual int get_id() {
-        return -1;
+        throw std::invalid_argument("I'm not river!");
     }
+
+    virtual direction get_dir() {
+        throw std::invalid_argument("I-m not river flow!");
+    }
+
     virtual void add_neigh(cell *neigh) {
         _neighbors.push_back(neigh);
     }
-    virtual cell *get_neigh(direction dir) {
+    
+    virtual cell* get_neigh(direction dir) {
         return _neighbors[dir];
     }
 
     virtual point get_coords() {
-        return point(_x, _y);
+        return _coords;
     }
 
     virtual void add_object(object *obj) {
         _objects.push_back(obj);
     }
+
     virtual void del_object(object *obj) {
         for (auto it = _objects.begin(); it != _objects.end(); ++it) {
             if (*it == obj) {
@@ -81,10 +94,6 @@ public:
         }
     }
 
-    virtual int sz() {
-        return _neighbors.size();
-    }
-
     virtual bool is_human() {
         for (auto h : _objects) {
             if (h->type() == "human") {
@@ -98,13 +107,17 @@ private:
     __int8_t _mask_walls;
     std::vector <cell*> _neighbors; // соседи TODO придумать норм название
     std::list <object*> _objects;
-    int _x;
-    int _y;
+    point _coords;
 };
 
 class empty_cell : public cell {
 public:
-    empty_cell(int x, int y, __int8_t mask_walls = 0) : cell(x, y, mask_walls) {}
+    empty_cell( point p, 
+                __int8_t mask_walls = 0) : 
+                    cell(p, mask_walls) 
+                    {}
+
+    empty_cell(cell* c) : cell(c) {}
     string type() {
         return "empty_cell";
     }
@@ -113,21 +126,29 @@ private:
 
 class river_flow : public cell {
 public:
-    river_flow( int x, 
-                int y, 
+    river_flow( point p,
                 direction dir, 
                 int id, 
                 __int8_t mask_walls = 0
                 ):     
                     _dir(dir), 
                     _id(id), 
-                    cell(x, y, mask_walls) 
+                    cell(p, mask_walls) 
                     {}
+    river_flow(cell *c, direction dir, int id) : 
+        cell(c), 
+        _dir(dir),
+        _id(id)
+        {}
+
     string type() {
         return "river_flow";
     }
     int get_id() {
         return _id;
+    }
+    direction get_dir() {
+        return _dir;
     }
 private:
     direction _dir;
@@ -136,7 +157,15 @@ private:
 
 class river_end : public cell {
 public:
-    river_end(int x, int y, int id, __int8_t mask_walls = 0) : _id(id), cell(x, y, mask_walls) {}
+    river_end(  point p,
+                int id, 
+                __int8_t mask_walls = 0) : 
+                    _id(id), 
+                    cell(p, mask_walls) 
+                    {}
+
+    river_end(cell *c, int id) : cell(c), _id(id) {}
+
     string type() {
         return "river_end";
     }
