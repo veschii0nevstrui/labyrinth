@@ -43,8 +43,19 @@ public:
     virtual void add_neigh(cell *neigh) {
         _neighbors.push_back(neigh);
     }
+    cell *get_neigh(direction dir) {
+        return _neighbors[dir];
+    }
     virtual void add_object(object *obj) {
         _objects.push_back(obj);
+    }
+    virtual void del_object(object *obj) {
+        for (auto it = _objects.begin(); it != _objects.end(); ++it) {
+            if (*it == obj) {
+                _objects.erase(it);
+                break;
+            }
+        }
     }
 
     virtual void write() {

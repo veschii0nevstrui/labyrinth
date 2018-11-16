@@ -61,12 +61,13 @@ public:
                 
                 std::string wall_down = "_";
                 std::string not_wall = " ";
+                
                 if (_cells[i][j]->type() == "river_flow") {
-                    wall_down = "\033[44_m\033[0m";
+                    wall_down = "\033[44m_\033[0m";
                     not_wall = "\033[44m \033[0m";
                 }
                 if (_cells[i][j]->type() == "river_end") {
-                    wall_down = "\033[42_m\033[0m";
+                    wall_down = "\033[42m_\033[0m";
                     not_wall = "\033[42m \033[0m";
                 }
 

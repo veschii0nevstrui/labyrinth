@@ -27,15 +27,21 @@ public:
         }
     }
 
+    void move(int num, direction dir) {
+        _humans[num]->move(dir);
+    }
+
 private:
     board _b;
     int _n, _m;
     setting _s;
+    vector <human*> _humans;
+
     void add_humans() {
         for (int cnt = 0; cnt < _s.cnt_human; ++cnt) {
             int i = rnd() % _n;
             int j = rnd() % _m;
-            human *h = new human(_b._cells[i][j], "Martin", cnt);
+            _humans.push_back(new human(_b._cells[i][j], "Martin", cnt));
         }
     }
     void add_treasures() {

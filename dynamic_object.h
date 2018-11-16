@@ -12,8 +12,9 @@ public:
     virtual std::string type() {
         return "dynamic_object";
     }
-private:
+protected:
     cell *_cell;
+private:
 };
 
 class treasure : public dynamic_object {
@@ -60,6 +61,14 @@ public:
 
     void add_treasure(treasure *tr) {
         _treasures.push_back(tr);
+    }
+
+    void move(direction dir) {
+        if (!_cell->is_wall(dir)) {
+            _cell->del_object(this);
+            _cell = _cell->get_neigh(dir);
+            _cell->add_object(this); 
+        }
     }
 
 private:
