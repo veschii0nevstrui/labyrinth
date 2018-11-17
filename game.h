@@ -17,14 +17,8 @@ public:
     }
 
     void write() {
-        _b.write();
-        cout << endl;
-        /*for (int i = 0; i < _n; ++i) {
-            for (int j = 0; j < _m; ++j) {
-                _b._cells[i][j]->write();
-                cout << endl;
-            }
-        }*/
+        //_b.write(); Uncomment this string if you want to see a board.
+        //cout << endl;
         for (auto h : _humans) {
             h->write();
         }
@@ -48,6 +42,9 @@ public:
     bool try_out(int num) {
         bool ans = _humans[num]->try_out();
         write();
+        if (ans) {
+            _b.write();
+        }
         return ans;
     }
 

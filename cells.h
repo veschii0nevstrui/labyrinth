@@ -51,7 +51,7 @@ public:
     }
 
     virtual direction get_dir() {
-        throw std::invalid_argument("I-m not river flow!");
+        throw std::invalid_argument("I'm not river flow!");
     }
 
     virtual void add_neigh(cell *neigh) {

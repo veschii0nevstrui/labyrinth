@@ -55,8 +55,7 @@ public:
     }
         
     void write() {
-        _cell->get_coords().write();
-        cout << _cell->type() << endl;;
+        cout << "Cell type: " << _cell->type() << endl;
         _cell->write_objects();
         
         cout << "In my bag: ";
@@ -89,15 +88,24 @@ public:
 
     void move(direction dir) {
         if (!_cell->is_wall(dir)) {
+            cout << "Ok, you move" << endl;
             auto old = swap(dir);
             
+            if ((_cell->type() == "river_flow" || _cell->type() == "river_end") && 
+                (old->type() == "river_flow" || old->type() == "river_end") && 
+                old->get_id() == _cell->get_id()) {
+                
+                cout << "You are riverwalker" << endl;
+            }
+
             if (_cell->type() == "river_flow") {
-                if ((old->type() != "river_flow" && old->type() != "river_end") || 
-                    old->get_id() != _cell->get_id()) {
-                    
+                if ((old->type() != "river_flow" && old->type() != "river_end") || old->get_id() != _cell->get_id()) {
+                    cout << "You got into the river and you were demolished" << endl;    
                     swim(2);
                 }
             }
+        } else {
+            cout << "Nope, there are wall" << endl;
         }
     }
 
@@ -119,6 +127,14 @@ public:
     }
 
     bool try_out() {
+        if (!_cell->is_out()) {
+            cout << "Sorry, there are no any exit" << endl;
+            return 0;
+        }
+        if (_treasures.empty()) {
+            cout << "Sorry, you have not any treasure(((" << endl;
+            return 0;
+        }
         while (!_treasures.empty()) {
             auto it = _treasures.begin();
             if ((*it)->is_true()) {
@@ -128,6 +144,8 @@ public:
                 _treasures.erase(it);
             }
         }
+        cout << "No, it is a lie treasure!" << endl;
+        return 0;
     }
 
 private:

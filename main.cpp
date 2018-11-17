@@ -49,6 +49,7 @@ int main() {
         setting s(p, cnt_r, len, n, m, cnt_h);
         game g(s);
         g.write();
+        cout << endl;
         set_non_canonical_mod();    
         while (true) {
             char c;
@@ -67,13 +68,12 @@ int main() {
                 if (g.try_out(0)) {
                     cout << "You win!\nCongratulation!!" << endl;
                     break;
-                } else {
-                    cout << "Nope, this is lie treasure))" << endl;
                 }
             }
             if (mp.find(c) != mp.end()) {
                 g.move(0, mp[c]);
             }
+            cout << endl;
         }
         set_canonical_mod();
 }
