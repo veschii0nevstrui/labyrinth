@@ -70,6 +70,15 @@ public:
         _objects.push_back(obj);
     }
 
+    virtual object* get_treasure() {
+        for (auto obj : _objects) {
+            if (obj->type() == "treasure") {
+                return obj;
+            }
+        }
+        return nullptr;
+    }
+
     virtual void del_object(object *obj) {
         for (auto it = _objects.begin(); it != _objects.end(); ++it) {
             if (*it == obj) {
@@ -77,6 +86,21 @@ public:
                 break;
             }
         }
+    }
+
+    virtual void write_objects() {
+        bool fl = 0;
+        cout << "There are in cell: ";
+        for (auto obj : _objects) {
+            if (obj->type() != "human") {
+                fl = 1;
+                cout << obj->type() << " ";
+            }
+        }
+        if (!fl) {
+            cout << "Nothing";
+        }
+        cout << endl;
     }
 
     virtual void write() {
@@ -97,6 +121,15 @@ public:
     virtual bool is_human() {
         for (auto h : _objects) {
             if (h->type() == "human") {
+                return 1;
+            }
+        }
+        return 0;
+    }
+
+    virtual bool is_out() {
+        for (auto h : _objects) {
+            if (h->type() == "out") {
                 return 1;
             }
         }

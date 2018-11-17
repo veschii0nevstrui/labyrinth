@@ -11,7 +11,7 @@ public:
         _m = s.m;
         _s = s;
 
-        add_humans();
+       add_humans();
         add_treasures();
         add_statics();
     }
@@ -26,13 +26,29 @@ public:
             }
         }*/
         for (auto h : _humans) {
-            h->get_coords().write();
-            cout << h->get_cell_type() << endl;
+            h->write();
         }
     }
 
     void move(int num, direction dir) {
         _humans[num]->move(dir);
+        write();
+    }
+
+    void take(int num) {
+        _humans[num]->take_treasure();
+        write();
+    }
+
+    void drop(int num) {
+        _humans[num]->drop_treasure();
+        write();
+    }
+    
+    bool try_out(int num) {
+        bool ans = _humans[num]->try_out();
+        write();
+        return ans;
     }
 
 private:
@@ -58,12 +74,14 @@ private:
     void add_statics() {
         int i = rnd() % _n;
         int j = rnd() % _m;
-        arsenal *a = new arsenal(_b._cells[i][j]);
+        //arsenal *a = new arsenal(_b._cells[i][j]);
         
         i = rnd() % _n;
         j = rnd() % _m;
-        hospital *h = new hospital(_b._cells[i][j]);
+        //hospital *h = new hospital(_b._cells[i][j]);
         
+        //Dont need in first release
+
         i = rnd() % _n;
         j = rnd() % _m;
         out *o = new out(_b._cells[i][j]);

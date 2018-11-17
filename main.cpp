@@ -3,11 +3,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <map>
 #include "game.h"
 
 using std::cin;
 using std::cout;
 using std::endl;
+using std::map;
 
 struct termios old_attributes;
 struct termios new_attributes;
@@ -27,19 +29,15 @@ void set_canonical_mod()
     tcsetattr(0, TCSANOW, &old_attributes);
 }
 
-direction ch[300];
+map <char, direction> mp;
 
 int main() {
-    ch['w'] = up;
-    ch['a'] = left;
-    ch['s'] = down;
-    ch['d'] = right;
-    while (true) {
+    mp['w'] = up;
+    mp['a'] = left;
+    mp['s'] = down;
+    mp['d'] = right;
         int n, m;
         cin >> n >> m;
-        if (n == 0) {
-            break;
-        }
         long double p;
         int cnt_r, len;
         int cnt_h;
@@ -55,13 +53,27 @@ int main() {
         while (true) {
             char c;
             cin >> c;
-            if (c == 'e') {
+            if (c == 'p') {
                 cout << "end" << endl;
                 break;
             }
-            g.move(0, ch[c]);
-            g.write();
+            if (c == 'e') {
+                g.take(0);
+            }
+            if (c == 'q') {
+                g.drop(0);
+            }
+            if (c == 'f') {
+                if (g.try_out(0)) {
+                    cout << "You win!\nCongratulation!!" << endl;
+                    break;
+                } else {
+                    cout << "Nope, this is lie treasure))" << endl;
+                }
+            }
+            if (mp.find(c) != mp.end()) {
+                g.move(0, mp[c]);
+            }
         }
         set_canonical_mod();
-    }
 }

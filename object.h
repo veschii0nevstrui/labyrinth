@@ -14,7 +14,10 @@ public:
     virtual std::string type() {
         return "object";
     }
-    virtual int get_id() {
+    virtual int get_id() { //TODO придумать, как обойтись без этих двух функций в родителе
+        return -1;
+    }
+    virtual bool is_true() {
         return -1;
     }
 private:

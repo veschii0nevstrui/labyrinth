@@ -54,6 +54,23 @@ public:
         return "human";
     }
         
+    void write() {
+        _cell->get_coords().write();
+        cout << _cell->type() << endl;;
+        _cell->write_objects();
+        
+        cout << "In my bag: ";
+        bool fl = 0;
+        for (auto obj : _treasures) {
+            cout << obj->type() << " ";
+            fl = 1;
+        }
+        if (!fl) {
+            cout << "Nothing";
+        }
+        cout << endl;
+    }
+
     std::string get_cell_type() {
         return _cell->type();
     }
@@ -84,10 +101,39 @@ public:
         }
     }
 
+    void take_treasure() {
+        object* tr = _cell->get_treasure();
+        if (tr == nullptr) {
+            return;
+        }
+        _treasures.push_back(tr);
+        _cell->del_object(tr);
+    }
+
+    void drop_treasure() {
+        for (auto it = _treasures.begin(); it != _treasures.end(); ++it) {
+            _cell->add_object(*it);
+            _treasures.erase(it);
+            break;
+        }
+    }
+
+    bool try_out() {
+        while (!_treasures.empty()) {
+            auto it = _treasures.begin();
+            if ((*it)->is_true()) {
+                _treasures.erase(it);
+                return 1;
+            } else {
+                _treasures.erase(it);
+            }
+        }
+    }
+
 private:
     std::string _name;
     int _id;
-    std::list <treasure*> _treasures;
+    std::list <object*> _treasures;
     
     void swim(int cnt) {
         if (cnt == 0) {
