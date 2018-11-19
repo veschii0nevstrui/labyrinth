@@ -25,6 +25,10 @@ class game;
 
 class board {
 public:
+    board() {
+        _n = 0;
+        _m = 0;
+    }
     board(setting &s) {
         _n = s.n;
         _m = s.m;

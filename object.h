@@ -1,5 +1,9 @@
 #pragma once
 #include <string>
+#include <iostream>
+
+using std::cout;
+using std::endl;
 
 /*
 Говнокодище. Я мог бы определить хороший конструктор объекта,
@@ -18,8 +22,9 @@ public:
         return -1;
     }
     virtual bool is_true() {
-        return -1;
+        return 0;
     }
+    virtual ~object() {}
 private:
 };
 

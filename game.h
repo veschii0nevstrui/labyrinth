@@ -6,15 +6,23 @@
 
 class game {
 public:
+    game() {
+        _n = 0;
+        _m = 0;
+        _b = board();
+        _s = setting();
+    }
     game(setting &s) : _b(s) {
         _n = s.n;
         _m = s.m;
         _s = s;
-
-       add_humans();
+        
+        add_humans();
         add_treasures();
         add_statics();
     }
+
+    ~game() {}
 
     void write() {
         //_b.write(); Uncomment this string if you want to see a board.

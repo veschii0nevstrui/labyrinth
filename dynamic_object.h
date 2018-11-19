@@ -15,6 +15,7 @@ public:
     virtual point get_coords() {
         return _cell->get_coords();
     }
+    virtual ~dynamic_object() {}
 protected:
     cell *_cell;
 private:
@@ -26,11 +27,15 @@ public:
         _is_true(is_true), 
         dynamic_object(cell),
         _id(id) {}
+
     std::string type() {
         return "treasure";
     }
     bool is_true() {
         return _is_true;
+    }
+    ~treasure() {
+        cout << "Delete treasure" << endl;
     }
 private:
     bool _is_true;
@@ -45,6 +50,7 @@ public:
         _id(id) {}
 
     ~human() {
+        cout << "delete human" << endl;
         for (auto &t : _treasures) {
             delete t;
         }
@@ -138,9 +144,11 @@ public:
         while (!_treasures.empty()) {
             auto it = _treasures.begin();
             if ((*it)->is_true()) {
+                delete (*it);
                 _treasures.erase(it);
                 return 1;
             } else {
+                delete (*it);
                 _treasures.erase(it);
             }
         }

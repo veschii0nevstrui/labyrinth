@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <signal.h>
 #include <map>
 #include "game.h"
 
@@ -30,8 +31,18 @@ void set_canonical_mod()
 }
 
 map <char, direction> mp;
+game *g = nullptr;
+
+void handler(int signal) {
+    if (g != nullptr) {
+        delete g;
+    }
+    set_canonical_mod();
+    exit(0);
+}
 
 int main() {
+    signal(SIGINT, handler);
     mp['w'] = up;
     mp['a'] = left;
     mp['s'] = down;
@@ -43,12 +54,12 @@ int main() {
         int cnt_h;
         cin >> p;
         cin >> cnt_r >> len;
-        cin >> cnt_h;
+        //cin >> cnt_h;
         cnt_h = 1;
 
         setting s(p, cnt_r, len, n, m, cnt_h);
-        game g(s);
-        g.write();
+        g = new game(s);
+        g->write();
         cout << endl;
         set_non_canonical_mod();    
         while (true) {
@@ -59,21 +70,22 @@ int main() {
                 break;
             }
             if (c == 'e') {
-                g.take(0);
+                g->take(0);
             }
             if (c == 'q') {
-                g.drop(0);
+                g->drop(0);
             }
             if (c == 'f') {
-                if (g.try_out(0)) {
+                if (g->try_out(0)) {
                     cout << "You win!\nCongratulation!!" << endl;
                     break;
                 }
             }
             if (mp.find(c) != mp.end()) {
-                g.move(0, mp[c]);
+                g->move(0, mp[c]);
             }
             cout << endl;
         }
         set_canonical_mod();
+    delete g;
 }
