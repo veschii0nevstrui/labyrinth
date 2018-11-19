@@ -1,7 +1,7 @@
 all: compil
 
 compil: main.cpp
-	g++ --std=c++11 main.cpp -o MySuperGame
+	g++ --std=c++11 main.cpp -o mySuperGame
 
 clear:
-	rm MySuperGame
+	rm mySuperGame

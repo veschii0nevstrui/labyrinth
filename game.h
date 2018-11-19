@@ -25,7 +25,7 @@ public:
     ~game() {}
 
     void write() {
-        //_b.write(); Uncomment this string if you want to see a board.
+        //_b.write(); //Uncomment this string if you want to see a board.
         //cout << endl;
         for (auto h : _humans) {
             h->write();

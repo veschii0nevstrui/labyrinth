@@ -34,9 +34,7 @@ public:
     bool is_true() {
         return _is_true;
     }
-    ~treasure() {
-        cout << "Delete treasure" << endl;
-    }
+    ~treasure() {}
 private:
     bool _is_true;
     int _id;
@@ -50,7 +48,6 @@ public:
         _id(id) {}
 
     ~human() {
-        cout << "delete human" << endl;
         for (auto &t : _treasures) {
             delete t;
         }
