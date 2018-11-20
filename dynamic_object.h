@@ -95,8 +95,8 @@ public:
             auto old = swap(dir);
             
             if ((_cell->type() == "river_flow" || _cell->type() == "river_end") && 
-                (old->type() == "river_flow" || old->type() == "river_end") && 
-                old->get_id() == _cell->get_id()) {
+                    (old->type() == "river_flow" || old->type() == "river_end") && 
+                    old->get_id() == _cell->get_id()) {
                 
                 cout << "You are riverwalker" << endl;
             }

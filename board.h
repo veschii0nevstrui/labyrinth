@@ -15,15 +15,12 @@
 #include "object.h"
 #include "hystory.h"
 
-std::mt19937 rnd(std::random_device{}());
 
 using std::cin;
 using std::cout;
 using std::vector;
 using std::string;
 using std::endl;
-
-class game;
 
 class board {
 public:
@@ -100,22 +97,9 @@ public:
         hystory::add(m);
         //m.write();// Расскоментируйте, если хотите, чтобы в процессе показывалась карта
     }
-
-    void write_id() {
-        for (int i = 0; i < _n; ++i) {
-            for (int j = 0; j < _m; ++j) {
-                int id = _cells[i][j]->get_id();
-                if (id == -1) {
-                    cout << " ";
-                } else {
-                    cout << id;
-                }
-            }
-            cout << endl;
-        }
+    const vector <cell*>& operator [] (int i) {
+        return _cells[i];
     }
-
-    friend game;
 
 private:
     vector <vector <cell*> > _cells;
@@ -212,16 +196,17 @@ private:
             point start = 0;
             for (int i = 0; i < _n; ++i) {
                 for (int j = 0; j < _m; ++j) {
-                    if (!used[i][j]) {
-                        if (num == 0) {
-                            int len = std::max(2, (int)rnd() % (_setting.mexp_len_river * 2));
-                            dfs_river({i, j}, used, len, 1, id_river, cnt_free);
-                            --num;
-                            break;
-                        } else {
-                            --num;
-                        }
+                    if (used[i][j]) {
+                        continue;
                     }
+                    if (num != 0) {
+                        --num;
+                        continue;
+                    }
+                    int len = std::max(2, (int)rnd() % (_setting.mexp_len_river * 2));
+                    dfs_river({i, j}, used, len, 1, id_river, cnt_free);
+                    --num;
+                    break;
                 }
                 if (num == -1) {
                     break;
@@ -257,12 +242,9 @@ private:
                 }
             }
         }
-        if (!fl) {
-            if (!is_start) {
-                _cells[v.x][v.y] = new river_end(_cells[v.x][v.y], id_river);
-                ++id_river;
-            }
-            return;
+        if (!fl && !is_start) {
+            _cells[v.x][v.y] = new river_end(_cells[v.x][v.y], id_river);
+            ++id_river;
         }
     }
     void add_neighbors() {

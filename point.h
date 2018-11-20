@@ -1,5 +1,8 @@
 #pragma once
 #include <iostream>
+#include <random>
+
+std::mt19937 rnd(std::random_device{}());
 
 enum direction {
     left = 0,
