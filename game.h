@@ -25,8 +25,7 @@ public:
     ~game() {}
 
     void write() {
-        //_b.write(); //Uncomment this string if you want to see a board.
-        //cout << endl;
+        _b.write();
         for (auto h : _humans) {
             h->write();
         }
@@ -50,9 +49,6 @@ public:
     bool try_out(int num) {
         bool ans = _humans[num]->try_out();
         write();
-        if (ans) {
-            _b.write();
-        }
         return ans;
     }
 

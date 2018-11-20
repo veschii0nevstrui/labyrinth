@@ -34,10 +34,10 @@ map <char, direction> mp;
 game *g = nullptr;
 
 void handler(int signal) {
-    if (g != nullptr) {
-        delete g;
-    }
     set_canonical_mod();
+    if (g != nullptr) {
+    delete g;
+    }
     exit(0);
 }
 
@@ -47,45 +47,57 @@ int main() {
     mp['a'] = left;
     mp['s'] = down;
     mp['d'] = right;
-        int n, m;
-        cin >> n >> m;
-        long double p;
-        int cnt_r, len;
-        int cnt_h;
-        cin >> p;
-        cin >> cnt_r >> len;
-        //cin >> cnt_h;
-        cnt_h = 1;
+    int n, m;
+    cin >> n >> m;
+    long double p;
+    int cnt_r, len;
+    int cnt_h;
+    cin >> p;
+    cin >> cnt_r >> len;
+    //cin >> cnt_h;
+    cnt_h = 1;
 
-        setting s(p, cnt_r, len, n, m, cnt_h);
-        g = new game(s);
-        g->write();
-        cout << endl;
-        set_non_canonical_mod();    
-        while (true) {
-            char c;
-            cin >> c;
-            if (c == 'p') {
-                cout << "end" << endl;
+    setting s(p, cnt_r, len, n, m, cnt_h);
+    g = new game(s);
+    hystory::add(' ');
+    g->write();
+    cout << endl;
+    set_non_canonical_mod();    
+    
+    while (true) {
+        char c;
+        cin >> c;
+        if (c == 'p') {
+            hystory::add(c);
+            cout << "end" << endl;
+            break;
+        }
+        if (c == 'e') {
+            hystory::add(c);
+            g->take(0);
+        }
+        if (c == 'q') {
+            hystory::add(c);
+            g->drop(0);
+        }
+        if (c == 'f') {
+            hystory::add(c);
+            if (g->try_out(0)) {
+                cout << "You win!\nCongratulation!!" << endl;
                 break;
             }
-            if (c == 'e') {
-                g->take(0);
-            }
-            if (c == 'q') {
-                g->drop(0);
-            }
-            if (c == 'f') {
-                if (g->try_out(0)) {
-                    cout << "You win!\nCongratulation!!" << endl;
-                    break;
-                }
-            }
-            if (mp.find(c) != mp.end()) {
-                g->move(0, mp[c]);
-            }
-            cout << endl;
         }
-        set_canonical_mod();
+        if (mp.find(c) != mp.end()) {
+            hystory::add(c);
+            g->move(0, mp[c]);
+        }
+        cout << endl;
+    }
+    getchar();
+    cout << "-------------------------" << endl;
+    cout << "-------------------------" << endl;
+    cout << "Hystory:" << endl; 
+    hystory::write();
+    set_canonical_mod();
     delete g;
 }

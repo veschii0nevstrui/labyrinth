@@ -13,12 +13,14 @@
 #include "cells.h"
 #include "point.h"
 #include "object.h"
+#include "hystory.h"
 
 std::mt19937 rnd(std::random_device{}());
 
 using std::cin;
 using std::cout;
 using std::vector;
+using std::string;
 using std::endl;
 
 class game;
@@ -45,22 +47,23 @@ public:
     }
 
     void write() {
-        cout << " ";
+        vector <vector <string> > new_map(_n + 1);
+        new_map[0].push_back(" ");
         for (int i = 0; i < _m; ++i) {
             if (_cells[0][i]->is_wall(up)) {
-                cout << "_ ";
+                new_map[0].push_back("_ ");
             } else {
-                cout << "  ";
+                new_map[0].push_back("  ");
             }
         }
-        cout << endl;
         
         for (int i = 0; i < _n; ++i) {
             for (int j = 0; j < _m; ++j) {
+                string str;
                 if (_cells[i][j]->is_wall(left)) {
-                    cout << "|";
+                    str = "|";
                 } else {
-                    cout << " ";
+                    str = " ";
                 }
                 
                 std::string wall_down = "_";
@@ -80,19 +83,22 @@ public:
                 }
 
                 if (_cells[i][j]->is_wall(down)) {
-                    cout << wall_down;
+                    str += wall_down;
                 } else {
-                    cout << not_wall;
+                    str += not_wall;
                 }
+                new_map[i + 1].push_back(str);
             }
             
             if (_cells[i][_m - 1]->is_wall(right)) {
-                cout << "|";
+                new_map[i + 1].push_back("|");
             } else {
-                cout << " ";
+                new_map[i + 1].push_back(" ");
             }
-            cout << endl;
         }
+        map m(new_map);
+        hystory::add(m);
+        //m.write();// Расскоментируйте, если хотите, чтобы в процессе показывалась карта
     }
 
     void write_id() {
