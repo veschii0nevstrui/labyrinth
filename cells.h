@@ -103,21 +103,6 @@ public:
         cout << endl;
     }
 
-    virtual void write() {
-        for (auto o : _objects) {
-            cout << o->type() << ", ";
-        }
-        cout << endl;
-        for (int i = 0; i < 4; ++i) {
-            cout << "    " << i << " ";
-            if (_neighbors[i] != nullptr) {
-                cout << _neighbors[i]->type() << endl;
-            } else {
-                cout << "out border" << endl;
-            }
-        }
-    }
-
     virtual bool is_human() {
         for (auto h : _objects) {
             if (h->type() == "human") {

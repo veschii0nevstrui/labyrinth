@@ -34,9 +34,9 @@ map <char, direction> mp;
 game *g = nullptr;
 
 void handler(int signal) {
-    set_canonical_mod();
     if (g != nullptr) {
-    delete g;
+        set_canonical_mod();
+        delete g;
     }
     exit(0);
 }
