@@ -95,7 +95,7 @@ public:
         }
         map m(new_map);
         hystory::add(m);
-        //m.write();// Расскоментируйте, если хотите, чтобы в процессе показывалась карта
+        m.write();// Расскоментируйте, если хотите, чтобы в процессе показывалась карта
     }
     const vector <cell*>& operator [] (int i) {
         return _cells[i];

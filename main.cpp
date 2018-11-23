@@ -61,7 +61,6 @@ int main() {
     g = new game(s);
     hystory::add(' ');
     g->write();
-    cout << endl;
     set_non_canonical_mod();    
     
     while (true) {
@@ -91,7 +90,6 @@ int main() {
             hystory::add(c);
             g->move(0, mp[c]);
         }
-        cout << endl;
     }
     getchar();
     cout << "-------------------------" << endl;

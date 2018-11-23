@@ -5,6 +5,7 @@
 #include <stdexcept>
 #include "point.h"
 #include "object.h"
+#include "dynamic_object.h"
 
 using std::string;
 using std::cout;
@@ -33,6 +34,12 @@ public:
             delete obj;
         }
     }
+
+    virtual void write() {
+        cout << "Type cell: " << type() << endl;
+        cout << "In cell: ";
+        write_objects();
+    }
         
     virtual void add_wall(int dir) {
         set_bit(_mask_walls, dir, 1);
@@ -47,11 +54,15 @@ public:
     }
 
     virtual int get_id() {
-        throw std::invalid_argument("I'm not river!");
+        return -1;
     }
 
     virtual direction get_dir() {
         throw std::invalid_argument("I'm not river flow!");
+    }
+
+    virtual cell* action(human *h, int old_id) {
+        return this;
     }
 
     virtual void add_neigh(cell *neigh) {
@@ -62,7 +73,7 @@ public:
         return _neighbors[dir];
     }
 
-    virtual point get_coords() {
+    virtual point get_coords() { //Выглядит как ненужная вещь
         return _coords;
     }
 
@@ -90,7 +101,6 @@ public:
 
     virtual void write_objects() {
         bool fl = 0;
-        cout << "There are in cell: ";
         for (auto obj : _objects) {
             if (obj->type() != "human") {
                 fl = 1;
@@ -121,11 +131,12 @@ public:
         return 0;
     }
 
-private:
+protected:
     __int8_t _mask_walls;
     std::vector <cell*> _neighbors; // соседи TODO придумать норм название
     std::list <object*> _objects;
-    point _coords;
+private:
+    point _coords; //Выглядит как ненужная вещь
 };
 
 class empty_cell : public cell {
@@ -162,15 +173,51 @@ public:
     string type() {
         return "river_flow";
     }
+    
     int get_id() {
         return _id;
     }
+
     direction get_dir() {
         return _dir;
     }
+
+    cell* action(human *h, int old_id) {
+        auto ptr = _objects.begin();
+        for (; ptr != _objects.end(); ++ptr) {
+            if (*ptr == h) {
+                break;
+            }
+        }
+        if (ptr == _objects.end()) {
+            throw std::invalid_argument("There are not this human!");
+        }
+
+        if (old_id == _id) {
+            cout << "You are riverwalker" << endl;
+            return this;
+        }
+
+        auto ans = dfs(this, 2);//Захардкоженная константа, фу таким быть!
+        
+        cout << "You found yourself in river flow and was carry" << endl;
+
+        _objects.erase(ptr);
+        ans->add_object(h);
+
+        return ans;
+    }
+
 private:
     direction _dir;
     int _id;
+
+    cell* dfs(cell *v, int cnt) {
+        if (cnt == 0 || v->type() == "river_end") {
+            return v;
+        }
+        return dfs(v->get_neigh(v->get_dir()), cnt - 1); //МБ добавить для потока get_next?
+    }
 };
 
 class river_end : public cell {
@@ -183,6 +230,25 @@ public:
                     {}
 
     river_end(cell *c, int id) : cell(c), _id(id) {}
+
+    cell *action(human *h, int old_id) {
+        //Дальше идёт копипаста, нехорошо. И всё ради того,
+        //чтобы сказать, что пидорас риверволкер.
+        auto ptr = _objects.begin();
+        for (; ptr != _objects.end(); ++ptr) {
+            if (*ptr == h) {
+                break;
+            }
+        }
+        if (ptr == _objects.end()) {
+            throw std::invalid_argument("There are not this human!");
+        }
+
+        if (old_id == _id) {
+            cout << "You are riverwalker" << endl;
+        }
+        return this;
+    }
 
     string type() {
         return "river_end";
