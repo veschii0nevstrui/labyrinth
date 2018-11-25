@@ -3,6 +3,7 @@
 #include "setting.h"
 #include "static_object.h"
 #include "dynamic_object.h"
+#include "class_names.h"
 
 class game {
 public:
@@ -16,8 +17,6 @@ public:
         add_treasures();
         add_statics();
     }
-
-    ~game() {}
 
     void write() {
         for (int i = 0; i < _humans.size(); ++i) {
@@ -47,7 +46,7 @@ public:
     }
 
     void take(int num) {
-        auto t = _cells[num]->get_treasure();
+        treasure *t = static_cast<treasure*>(_cells[num]->get_object(TREASURE));
         if (t == nullptr) {
             cout << "Sorry, there are not any treasure(" << endl;
             write();
@@ -75,7 +74,7 @@ public:
     }
     
     bool try_out(int num) {
-        if (!_cells[num]->is_out()) {
+        if (!_cells[num]->is_object(OUT)) {
             cout << "Sorry, there are not out" << endl;
             write();
             return 0;
@@ -108,8 +107,8 @@ private:
 
     void add_humans() {
         for (int cnt = 0; cnt < _s.cnt_human; ++cnt) {
-            int i = rnd() % _n;
-            int j = rnd() % _m;
+            int i = rnd(_n);
+            int j = rnd(_m);
             
             auto h = new human("Martin", cnt);
             _humans.push_back(h);
@@ -119,26 +118,16 @@ private:
     }
     void add_treasures() {
         for (int q = 0; q < 2; ++q) {
-            int i = rnd() % _n;
-            int j = rnd() % _m;
+            int i = rnd(_n);
+            int j = rnd(_m);
 
             auto t = new treasure(q, q);
             _b[i][j]->add_object(t);
         }
     }
     void add_statics() {
-        int i = rnd() % _n;
-        int j = rnd() % _m;
-        //arsenal *a = new arsenal(_b[i][j]);
-        
-        i = rnd() % _n;
-        j = rnd() % _m;
-        //hospital *h = new hospital(_b[i][j]);
-        
-        //Dont need in first release
-
-        i = rnd() % _n;
-        j = rnd() % _m;
+        int i = rnd(_n);
+        int j = rnd(_m);
         out *o = new out();
         _b[i][j]->add_object(o);
     }

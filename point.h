@@ -2,7 +2,15 @@
 #include <iostream>
 #include <random>
 
-std::mt19937 rnd(std::random_device{}());
+std::mt19937 _rnd(std::random_device{}());
+
+int rnd(int a) {
+    return _rnd() % a;
+}
+
+bool rnd(int p, int q) {
+    return rnd(q) < p;
+}
 
 enum direction {
     left = 0,

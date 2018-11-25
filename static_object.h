@@ -1,12 +1,12 @@
 #pragma once
 #include <string>
 #include "object.h"
-#include "cells.h"
+#include "class_names.h"
 
 class static_object : public object {
 public:
     virtual std::string type() {
-        return "static_object";
+        return STATIC_OBJECT;
     }
 private:
 };
@@ -14,7 +14,7 @@ private:
 class arsenal : public static_object {
 public:
     std::string type() {
-        return "arsenal";
+        return ARSENAL;
     }
 private:
 };
@@ -22,7 +22,7 @@ private:
 class hospital : public static_object {
 public:
     std::string type() {
-        return "hospital";
+        return HOSPITAL;
     }
 private:
 };
@@ -30,7 +30,7 @@ private:
 class out : public static_object {
 public:
     std::string type() {
-        return "out";
+        return OUT;
     }
 private:
 };

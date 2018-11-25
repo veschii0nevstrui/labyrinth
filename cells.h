@@ -3,9 +3,11 @@
 #include <vector>
 #include <list>
 #include <stdexcept>
+
 #include "point.h"
 #include "object.h"
 #include "dynamic_object.h"
+#include "class_names.h"
 
 using std::string;
 using std::cout;
@@ -13,20 +15,18 @@ using std::endl;
 
 class cell {
 public:
-    cell(point coords, __int8_t mask_walls = 0) : 
-        _mask_walls(mask_walls),
-        _coords(coords)
+    cell(__int8_t mask_walls = 0) : 
+        _mask_walls(mask_walls)
         {}
 
     cell(cell *c) :
-            _coords(c->_coords),
             _mask_walls(c->_mask_walls)
             {
         delete c;
     }
 
     virtual string type() {
-        return "cell";
+        return CELL;
     }
     
     ~cell() {
@@ -73,17 +73,13 @@ public:
         return _neighbors[dir];
     }
 
-    virtual point get_coords() { //Выглядит как ненужная вещь
-        return _coords;
-    }
-
     virtual void add_object(object *obj) {
         _objects.push_back(obj);
     }
 
-    virtual object* get_treasure() {
+    virtual object* get_object(const string &type) {
         for (auto obj : _objects) {
-            if (obj->type() == "treasure") {
+            if (obj->type() == type) {
                 return obj;
             }
         }
@@ -99,10 +95,19 @@ public:
         }
     }
 
+    virtual bool is_object(const string &type) {
+        for (auto h : _objects) {
+            if (h->type() == type) {
+                return 1;
+            }
+        }
+        return 0;
+    }
+
     virtual void write_objects() {
         bool fl = 0;
         for (auto obj : _objects) {
-            if (obj->type() != "human") {
+            if (obj->type() != HUMAN) {
                 fl = 1;
                 cout << obj->type() << " ";
             }
@@ -113,56 +118,35 @@ public:
         cout << endl;
     }
 
-    virtual bool is_human() {
-        for (auto h : _objects) {
-            if (h->type() == "human") {
-                return 1;
-            }
-        }
-        return 0;
-    }
-
-    virtual bool is_out() {
-        for (auto h : _objects) {
-            if (h->type() == "out") {
-                return 1;
-            }
-        }
-        return 0;
-    }
-
 protected:
     __int8_t _mask_walls;
     std::vector <cell*> _neighbors; // соседи TODO придумать норм название
     std::list <object*> _objects;
 private:
-    point _coords; //Выглядит как ненужная вещь
 };
 
 class empty_cell : public cell {
 public:
-    empty_cell( point p, 
-                __int8_t mask_walls = 0) : 
-                    cell(p, mask_walls) 
+    empty_cell(     __int8_t mask_walls) : 
+                    cell(mask_walls) 
                     {}
 
     empty_cell(cell* c) : cell(c) {}
     string type() {
-        return "empty_cell";
+        return EMPTY_CELL;
     }
 private:
 };
 
 class river_flow : public cell {
 public:
-    river_flow( point p,
-                direction dir, 
+    river_flow( direction dir, 
                 int id, 
-                __int8_t mask_walls = 0
+                __int8_t mask_walls
                 ):     
                     _dir(dir), 
                     _id(id), 
-                    cell(p, mask_walls) 
+                    cell(mask_walls) 
                     {}
     river_flow(cell *c, direction dir, int id) : 
         cell(c), 
@@ -171,7 +155,7 @@ public:
         {}
 
     string type() {
-        return "river_flow";
+        return RIVER_FLOW;
     }
     
     int get_id() {
@@ -213,7 +197,7 @@ private:
     int _id;
 
     cell* dfs(cell *v, int cnt) {
-        if (cnt == 0 || v->type() == "river_end") {
+        if (cnt == 0 || v->type() == RIVER_END) {
             return v;
         }
         return dfs(v->get_neigh(v->get_dir()), cnt - 1); //МБ добавить для потока get_next?
@@ -222,11 +206,10 @@ private:
 
 class river_end : public cell {
 public:
-    river_end(  point p,
-                int id, 
-                __int8_t mask_walls = 0) : 
+    river_end(  int id, 
+                __int8_t mask_walls) : 
                     _id(id), 
-                    cell(p, mask_walls) 
+                    cell(mask_walls) 
                     {}
 
     river_end(cell *c, int id) : cell(c), _id(id) {}
@@ -251,7 +234,7 @@ public:
     }
 
     string type() {
-        return "river_end";
+        return RIVER_END;
     }
     int get_id() {
         return _id;

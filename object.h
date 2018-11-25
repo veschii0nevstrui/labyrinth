@@ -1,6 +1,6 @@
 #pragma once
 #include <string>
-#include <iostream>
+#include "class_names.h"
 
 using std::cout;
 using std::endl;
@@ -16,13 +16,7 @@ using std::endl;
 class object {
 public:
     virtual std::string type() {
-        return "object";
-    }
-    virtual int get_id() { //TODO придумать, как обойтись без этих двух функций в родителе
-        return -1;
-    }
-    virtual bool is_true() {
-        return 0;
+        return OBJECT;
     }
     virtual ~object() {}
 private:

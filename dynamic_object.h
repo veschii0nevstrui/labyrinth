@@ -2,15 +2,13 @@
 #include <list>
 #include <string>
 #include "object.h"
+#include "class_names.h"
 
 class dynamic_object : public object {
 public:
     virtual std::string type() {
-        return "dynamic_object";
+        return DYNAMIC_OBJECT;
     }
-    virtual ~dynamic_object() {}
-protected:
-private:
 };
 
 class treasure : public dynamic_object {
@@ -20,7 +18,7 @@ public:
         _id(id) {}
 
     std::string type() {
-        return "treasure";
+        return TREASURE;
     }
     bool is_true() {
         return _is_true;
@@ -44,7 +42,7 @@ public:
     }
 
     std::string type() {
-        return "human";
+        return HUMAN;
     }
         
     void write() {
@@ -69,11 +67,11 @@ public:
         return _name;
     }
 
-    void add_treasure(object *tr) {
+    void add_treasure(treasure *tr) {
         _treasures.push_back(tr);
     }
 
-    object* get_treasure() {
+    treasure* get_treasure() {
         if (!_treasures.empty()) {
             return *_treasures.begin();
         } else {
@@ -81,7 +79,7 @@ public:
         }
     }
 
-    void del_treasure(object *tr) {
+    void del_treasure(treasure *tr) {
         for (auto id = _treasures.begin(); id != _treasures.end(); ++id) {
             if (*id == tr) {
                 _treasures.erase(id);
@@ -93,7 +91,7 @@ public:
 private:
     std::string _name;
     int _id;
-    std::list <object*> _treasures;
+    std::list <treasure*> _treasures;
 };
 
 

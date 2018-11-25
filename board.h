@@ -66,15 +66,15 @@ public:
                 std::string wall_down = "_";
                 std::string not_wall = " ";
                 
-                if (_cells[i][j]->type() == "river_flow") {
+                if (_cells[i][j]->type() == RIVER_FLOW) {
                     wall_down = "\033[44m_\033[0m";
                     not_wall = "\033[44m \033[0m";
                 }
-                if (_cells[i][j]->type() == "river_end") {
+                if (_cells[i][j]->type() == RIVER_END) {
                     wall_down = "\033[42m_\033[0m";
                     not_wall = "\033[42m \033[0m";
                 }
-                if (_cells[i][j]->is_human()) {
+                if (_cells[i][j]->is_object(HUMAN)) {
                     wall_down = "\033[48;5;208m_\033[0m";
                     not_wall = "\033[48;5;208m \033[0m";
                 }
@@ -95,7 +95,7 @@ public:
         }
         map m(new_map);
         hystory::add(m);
-        m.write();// Расскоментируйте, если хотите, чтобы в процессе показывалась карта
+        //m.write();// Расскоментируйте, если хотите, чтобы в процессе показывалась карта
     }
     const vector <cell*>& operator [] (int i) {
         return _cells[i];
@@ -115,7 +115,7 @@ private:
         _cells.assign(_n, vector <cell*> (_m, nullptr));
         for (int i = 0; i < _n; ++i) {
             for (int j = 0; j < _m; ++j) {
-                _cells[i][j] = new empty_cell(point{i, j}, 1 | 2 | 4 | 8);
+                _cells[i][j] = new empty_cell(1 | 2 | 4 | 8);
             }
         }
 
@@ -142,7 +142,7 @@ private:
             edges.push_back({{_n - 1, j}, right});
         }
 
-        std::random_shuffle(edges.begin(), edges.end(), [](int mod){ return rnd() % mod;});
+        std::random_shuffle(edges.begin(), edges.end(), [](int mod){ return rnd(mod);});
         // ЗАЧЕКАТЬ, ЧТО ЭТА ШТУКА СЛУЧАЙНА И РАВНОМЕРНА
         
         for (auto edge : edges) {
@@ -179,7 +179,7 @@ private:
     }
     
     void random_edge(point v, direction d, int p, int q) {
-        if (rnd() % q < p) {
+        if (rnd(p, q)) {
             point nv = v + dxy[d];
             _cells[v.x][v.y]->del_wall(d);
             _cells[nv.x][nv.y]->del_wall(back_dir(d));
@@ -192,7 +192,7 @@ private:
         vector <vector <bool> > used(_n, vector <bool> (_m, 0));
 
         while (id_river < _setting.cnt_source && cnt_free > 0) {
-            int num = rnd() % cnt_free;
+            int num = rnd(cnt_free);
             point start = 0;
             for (int i = 0; i < _n; ++i) {
                 for (int j = 0; j < _m; ++j) {
@@ -203,7 +203,7 @@ private:
                         --num;
                         continue;
                     }
-                    int len = std::max(2, (int)rnd() % (_setting.mexp_len_river * 2));
+                    int len = std::max(2, rnd(_setting.mexp_len_river * 2));
                     dfs_river({i, j}, used, len, 1, id_river, cnt_free);
                     --num;
                     break;
